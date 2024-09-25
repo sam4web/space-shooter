@@ -6,12 +6,10 @@ your score!
 
 ## Table of Contents
 
-- [Space Shooter Game](#space-shooter-game)
-  - [Table of Contents](#table-of-contents)
-  - [Objective](#objective)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Controls](#controls)
+- [Objective](#objective)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Controls](#controls)
 
 ## Objective
 
