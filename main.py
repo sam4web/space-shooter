@@ -27,6 +27,7 @@ class Game:
         self.last_asteroid_summon_time = 0
         self.current_level = 0
         self.asteroid_destroyed = 0
+        self.score = 0
 
         # group
         self.all_sprites = pygame.sprite.Group()
@@ -51,8 +52,8 @@ class Game:
 
     def display_score(self):
         font = pygame.font.Font(os.path.join("data", "fonts", "Oxanium-Bold.ttf"), 35)
-        score = self.asteroid_destroyed * (self.current_level + 10)
-        score = "Score: " + (f"0{score}" if score < 10 else str(score))
+        self.score = self.asteroid_destroyed * (self.current_level + 10)
+        score = "Score: " + (f"0{self.score}" if self.score < 10 else str(self.score))
         text_surf = font.render(score, True, "#c7dcd0")
         text_rect = text_surf.get_frect(
             midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50)
@@ -168,6 +169,7 @@ class Game:
             pygame.display.update()
 
         pygame.quit()
+        print(f"Score: {self.score}")
         sys.exit()
 
 
