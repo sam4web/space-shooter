@@ -1,7 +1,6 @@
-import os.path
-import sys
-
-import pygame
+import json
+from math import floor
+from random import uniform
 
 from data.scripts.asteroid import Asteroid
 from data.scripts.bulllet import Bullet
@@ -17,17 +16,16 @@ class Game:
         pygame.init()
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.background = pygame.image.load(
-            os.path.join("data", "images", "space-bg.jpg")
+            join("data", "images", "space-bg.jpg")
         ).convert_alpha()
         pygame.display.set_caption(WINDOW_TITLE)
         self.clock = pygame.time.Clock()
         self.running = True
+        self.game_setup()
 
-        self.asteroid_summon_cooldown = 200
+        # astroid timer
+        self.asteroid_cooldown = 200
         self.last_asteroid_summon_time = 0
-        self.current_level = 0
-        self.asteroid_destroyed = 0
-        self.score = 0
 
         # group
         self.all_sprites = pygame.sprite.Group()
@@ -40,47 +38,51 @@ class Game:
         # frames
         self.explosion_frames = [
             pygame.image.load(
-                os.path.join("data", "images", "explosion", f"{i}.png")
+                join("data", "images", "explosion", f"{i}.png")
             ).convert_alpha()
             for i in range(7)
         ]
 
         # game music
-        game_music = pygame.mixer.Sound(os.path.join("data", "audio", "game_music.wav"))
+        game_music = pygame.mixer.Sound(join("data", "audio", "game_music.wav"))
         game_music.set_volume(0.4)
         game_music.play()
 
     def display_score(self):
-        font = pygame.font.Font(os.path.join("data", "fonts", "Oxanium-Bold.ttf"), 35)
-        self.score = self.asteroid_destroyed * (self.current_level + 10)
+        # score
+        score_font = pygame.font.Font(join("data", "fonts", "Oxanium-Bold.ttf"), 35)
         score = "Score: " + (f"0{self.score}" if self.score < 10 else str(self.score))
-        text_surf = font.render(score, True, "#c7dcd0")
-        text_rect = text_surf.get_frect(
+        score_surf = score_font.render(score, True, "#c7dcd0")
+        score_rect = score_surf.get_frect(
             midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50)
         )
-        self.display_surface.blit(text_surf, text_rect)
+        self.display_surface.blit(score_surf, score_rect)
         pygame.draw.rect(
             self.display_surface,
             "#c7dcd0",
-            text_rect.inflate(30, 20).move(0, -8),
+            score_rect.inflate(30, 20).move(0, -8),
             5,
             10,
         )
 
-    def difficulty_timer(self):
-        """
-        Checks the time since the game started and decreases asteroid cooldown when it matches the level's time step.
-        """
-        levels_time_stamp = [8, 14, 18, 22]
-        current_time = pygame.time.get_ticks() // 1000 + 1
+        # high score
+        high_score_font = pygame.font.Font(
+            join("data", "fonts", "Oxanium-Bold.ttf"), 25
+        )
+        high_score_surf = high_score_font.render(
+            f"High Score: {self.high_score}", True, "#c7dcd0"
+        )
+        high_score_rect = high_score_surf.get_frect(topleft=(20, 20))
+        self.display_surface.blit(high_score_surf, high_score_rect)
 
-        if self.current_level >= len(levels_time_stamp):
-            self.asteroid_summon_cooldown = 0
-            return
-
-        if current_time >= levels_time_stamp[self.current_level]:
-            self.current_level += 1
-            self.asteroid_summon_cooldown -= 50
+    def asteroid_timer(self):
+        """
+        tracks the time since the last asteroid summon and spawns a new one if the cooldown has passed.
+        """
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_asteroid_summon_time >= self.asteroid_cooldown:
+            self.last_asteroid_summon_time = pygame.time.get_ticks()
+            Asteroid((self.all_sprites, self.asteroid_sprites))
 
     def check_collision(self):
         """
@@ -95,11 +97,9 @@ class Game:
             )
             if collided_sprites:
                 bullet.kill()
-                self.asteroid_destroyed += 1
+                self.update_score()
                 # explosion sound & animation
-                pygame.mixer.Sound(
-                    os.path.join("data", "audio", "explosion.wav")
-                ).play()
+                pygame.mixer.Sound(join("data", "audio", "explosion.wav")).play()
                 SpriteAnimation(
                     self.explosion_frames, bullet.rect.midtop, self.all_sprites
                 )
@@ -108,19 +108,41 @@ class Game:
         if pygame.sprite.spritecollide(
             self.player, self.asteroid_sprites, False, pygame.sprite.collide_mask
         ):
-            self.running = False
+            self.load_game()
 
-    def asteroid_timer(self):
+    def update_score(self):
+        self.score += floor(10 * uniform(0, 1) + uniform(0, 10))
+
+    def get_score(self):
+        try:
+            with open(score_file, "r") as file:
+                self.high_score = json.load(file)["highScore"]
+        except:
+            self.high_score = 0
+
+    def check_score(self):
+        if self.score > self.high_score:
+            with open(score_file, "w") as file:
+                self.high_score = self.score
+                json.dump({"highScore": self.high_score}, file)
+
+    def load_timer(self):
+        pass
+
+    def game_setup(self):
+        self.get_score()
+        self.score = 0
+
+    def load_game(self):
         """
-        tracks the time since the last asteroid summon and spawns a new one if the cooldown has passed.
+        - check for high score
+        - 5 seconds delay
+        - run this function when game starts and if game over
         """
-        current_time = pygame.time.get_ticks()
-        if (
-            current_time - self.last_asteroid_summon_time
-            >= self.asteroid_summon_cooldown
-        ):
-            self.last_asteroid_summon_time = pygame.time.get_ticks()
-            Asteroid((self.all_sprites, self.asteroid_sprites))
+        self.game_setup()
+        self.check_score()
+        self.get_score()
+        print("die")
 
     def shoot_bullet(self):
         """
@@ -157,9 +179,8 @@ class Game:
 
             # update
             self.input()
-            self.asteroid_timer()
             self.check_collision()
-            self.difficulty_timer()
+            self.asteroid_timer()
             self.all_sprites.update(dt)
 
             # draw
@@ -169,7 +190,6 @@ class Game:
             pygame.display.update()
 
         pygame.quit()
-        print(f"Score: {self.score}")
         sys.exit()
 
 

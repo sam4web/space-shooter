@@ -1,7 +1,3 @@
-import os
-
-import pygame
-
 from .settings import *
 
 
@@ -10,7 +6,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(group)
         self.group = group
         self.original_surf = pygame.image.load(
-            os.path.join("data", "images", "ship.png")
+            join("data", "images", "ship.png")
         ).convert_alpha()
         self.image = self.original_surf
         self.rect = self.image.get_frect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))

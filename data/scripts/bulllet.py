@@ -1,7 +1,3 @@
-import os
-
-import pygame
-
 from .settings import *
 
 
@@ -9,7 +5,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, direction, angle, group):
         super().__init__(group)
         self.original_surf = pygame.image.load(
-            os.path.join("data", "images", "bullet.png")
+            join("data", "images", "bullet.png")
         ).convert_alpha()
         self.image = self.original_surf
         self.rect = self.image.get_frect(center=pos)
@@ -19,7 +15,7 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = pygame.Vector2(direction)
         self.angle = angle
 
-        pygame.mixer.Sound(os.path.join("data", "audio", "bullet.wav")).play()
+        pygame.mixer.Sound(join("data", "audio", "bullet.wav")).play()
 
     def check_collision(self):
         # checks if bullet is out of the display window
