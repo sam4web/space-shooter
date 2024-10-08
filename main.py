@@ -1,11 +1,6 @@
 import pygame.time
 
-from scripts.asteroid import Asteroid
-from scripts.bullet import Bullet
-from scripts.display_text import DisplayText
-from scripts.player import Player
-from scripts.settings import *
-from scripts.sprite_animation import SpriteAnimation
+from scripts import *
 
 
 class Game:
@@ -92,7 +87,7 @@ class Game:
 
         # check for player collision
         if pygame.sprite.spritecollide(
-            self.player, self.asteroid_sprites, False, pygame.sprite.collide_mask
+                self.player, self.asteroid_sprites, False, pygame.sprite.collide_mask
         ):
             self.reset_game()
 
