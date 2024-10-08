@@ -1,9 +1,8 @@
-import json
-from math import floor
-from random import uniform
+import pygame.time
 
 from scripts.asteroid import Asteroid
 from scripts.bullet import Bullet
+from scripts.display_text import DisplayText
 from scripts.player import Player
 from scripts.settings import *
 from scripts.sprite_animation import SpriteAnimation
@@ -21,10 +20,10 @@ class Game:
         pygame.display.set_caption(WINDOW_TITLE)
         self.clock = pygame.time.Clock()
         self.running = True
-        self.game_setup()
+        self.load_game()
 
         # astroid timer
-        self.asteroid_cooldown = 200
+        self.asteroid_cooldown = 150
         self.last_asteroid_summon_time = 0
 
         # group
@@ -50,30 +49,17 @@ class Game:
 
     def display_score(self):
         # score
-        score_font = pygame.font.Font(join("data", "fonts", "Oxanium-Bold.ttf"), 35)
-        score = "Score: " + (f"0{self.score}" if self.score < 10 else str(self.score))
-        score_surf = score_font.render(score, True, "#c7dcd0")
-        score_rect = score_surf.get_frect(
-            midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50)
+        DisplayText(
+            text="Score: " + (f"0{self.score}" if self.score < 10 else str(self.score)),
+            size=35,
+            pos=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 70),
+            border=True,
         )
-        self.display_surface.blit(score_surf, score_rect)
-        pygame.draw.rect(
-            self.display_surface,
-            "#c7dcd0",
-            score_rect.inflate(30, 20).move(0, -8),
-            5,
-            10,
-        )
-
         # high score
-        high_score_font = pygame.font.Font(
-            join("data", "fonts", "Oxanium-Bold.ttf"), 25
+        DisplayText(
+            text=f"High Score: {self.high_score}",
+            pos=(110, 35),
         )
-        high_score_surf = high_score_font.render(
-            f"High Score: {self.high_score}", True, "#c7dcd0"
-        )
-        high_score_rect = high_score_surf.get_frect(topleft=(20, 20))
-        self.display_surface.blit(high_score_surf, high_score_rect)
 
     def asteroid_timer(self):
         """
@@ -108,12 +94,15 @@ class Game:
         if pygame.sprite.spritecollide(
             self.player, self.asteroid_sprites, False, pygame.sprite.collide_mask
         ):
-            self.load_game()
+            self.reset_game()
 
     def update_score(self):
         self.score += floor(10 * uniform(0, 1) + uniform(0, 10))
 
-    def get_score(self):
+    def get_high_score(self):
+        """
+        imports the high score from file and loads it into the game
+        """
         try:
             with open(score_file, "r") as file:
                 self.high_score = json.load(file)["highScore"]
@@ -121,28 +110,35 @@ class Game:
             self.high_score = 0
 
     def check_score(self):
+        """
+        updates the file with the new high score if the current score exceeds the previous high score
+        """
         if self.score > self.high_score:
             with open(score_file, "w") as file:
                 self.high_score = self.score
                 json.dump({"highScore": self.high_score}, file)
 
-    def load_timer(self):
-        pass
-
-    def game_setup(self):
-        self.get_score()
+    def load_game(self):
+        self.get_high_score()
         self.score = 0
 
-    def load_game(self):
+    def clear_screen(self):
         """
-        - check for high score
-        - 5 seconds delay
-        - run this function when game starts and if game over
+        clears asteroids and bullets sprites from display screen
         """
-        self.game_setup()
+        for sprite in self.asteroid_sprites:
+            sprite.kill()
+        for sprite in self.bullet_sprites:
+            sprite.kill()
+
+    def reset_game(self):
+        """
+        resets the game by updating the high score, resetting the score, and clearing asteroids and bullets.
+        """
         self.check_score()
-        self.get_score()
-        print("die")
+        self.load_game()
+        self.player.rect.center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
+        self.clear_screen()
 
     def shoot_bullet(self):
         """
