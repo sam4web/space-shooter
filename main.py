@@ -2,11 +2,11 @@ import json
 from math import floor
 from random import uniform
 
-from data.scripts.asteroid import Asteroid
-from data.scripts.bulllet import Bullet
-from data.scripts.player import Player
-from data.scripts.settings import *
-from data.scripts.sprite_animation import SpriteAnimation
+from scripts.asteroid import Asteroid
+from scripts.bullet import Bullet
+from scripts.player import Player
+from scripts.settings import *
+from scripts.sprite_animation import SpriteAnimation
 
 
 class Game:
