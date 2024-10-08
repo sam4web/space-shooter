@@ -6,7 +6,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(group)
         self.group = group
         self.original_surf = pygame.image.load(
-            join("data", "images", "ship.png")
+            join("assets", "images", "ship.png")
         ).convert_alpha()
         self.image = self.original_surf
         self.rect = self.image.get_frect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))

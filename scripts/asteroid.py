@@ -1,4 +1,4 @@
-from random import randrange, uniform
+from random import randrange
 
 from .settings import *
 
@@ -7,7 +7,7 @@ class Asteroid(pygame.sprite.Sprite):
     def __init__(self, group):
         super().__init__(group)
         self.original_surf = pygame.image.load(
-            join("data", "images", "asteroid.png")
+            join("assets", "images", "asteroid.png")
         ).convert_alpha()
         self.image = self.original_surf
         self.rect = self.image.get_frect(center=(randrange(WINDOW_WIDTH), -10))

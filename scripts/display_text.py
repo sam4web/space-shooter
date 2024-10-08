@@ -5,7 +5,7 @@ class DisplayText:
     def __init__(
         self, text, size=25, color="#c7dcd0", pos=(0, 0), border=False, padding=(30, 20)
     ):
-        self.font = pygame.font.Font(join("data", "fonts", "Oxanium-Bold.ttf"), size)
+        self.font = pygame.font.Font(join("assets", "fonts", "Oxanium-Bold.ttf"), size)
         self.surf = self.font.render(text, True, color)
         self.rect = self.surf.get_frect(center=pos)
         self.display_surface = pygame.display.get_surface()

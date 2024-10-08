@@ -15,7 +15,7 @@ class Game:
         pygame.init()
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.background = pygame.image.load(
-            join("data", "images", "space-bg.jpg")
+            join("assets", "images", "space-bg.jpg")
         ).convert_alpha()
         pygame.display.set_caption(WINDOW_TITLE)
         self.clock = pygame.time.Clock()
@@ -37,13 +37,13 @@ class Game:
         # frames
         self.explosion_frames = [
             pygame.image.load(
-                join("data", "images", "explosion", f"{i}.png")
+                join("assets", "images", "explosion", f"{i}.png")
             ).convert_alpha()
             for i in range(7)
         ]
 
         # game music
-        game_music = pygame.mixer.Sound(join("data", "audio", "game_music.wav"))
+        game_music = pygame.mixer.Sound(join("assets", "audio", "game_music.wav"))
         game_music.set_volume(0.4)
         game_music.play()
 
@@ -85,7 +85,7 @@ class Game:
                 bullet.kill()
                 self.update_score()
                 # explosion sound & animation
-                pygame.mixer.Sound(join("data", "audio", "explosion.wav")).play()
+                pygame.mixer.Sound(join("assets", "audio", "explosion.wav")).play()
                 SpriteAnimation(
                     self.explosion_frames, bullet.rect.midtop, self.all_sprites
                 )
