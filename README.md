@@ -4,12 +4,16 @@ A 2D space shooter game built using Python and Pygame where the player controls 
 as possible and survive for as long as you can while avoiding incoming asteroids. The longer you survive, the higher
 your score!
 
+![Gameplay Video](./gameplay.gif)
+
 ## Table of Contents
 
-- [Objective](#objective)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Controls](#controls)
+- [Space Shooter Game](#space-shooter-game)
+  - [Table of Contents](#table-of-contents)
+  - [Objective](#objective)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Controls](#controls)
 
 ## Objective
 
